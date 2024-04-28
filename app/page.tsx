@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/components/ui/Navbar";
+import Navbar from "@/components/Navbar";
 import { useEffect, useState } from "react";
 import { AudioRecorder } from "react-audio-voice-recorder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

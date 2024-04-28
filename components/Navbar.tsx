@@ -1,4 +1,4 @@
-import { Button } from "./button";
+import { Button } from "./ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -58,7 +58,7 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
             <ScrollArea className="h-5/6">
                 {
                     meetings.map((value,index) => (
-                        <div className="p-2 mr-3 cursor-pointer hover:bg-muted rounded-md">
+                        <div key={index} className="p-2 mr-3 cursor-pointer hover:bg-muted rounded-md">
                             <span>{value.title}</span>
                         </div>
                     ))
