@@ -87,7 +87,7 @@ export default function Home() {
   },[text])
 
   return (
-    <main className="w-screen h-screen flex">
+    <main className="w-screen h-screen flex overflow-hidden ">
       <Menu onClick={ () => {setNavbarOpen(!isNavbarOpen)} } className="size-10 m-2 block absolute top-0 right-0 sm:hidden" />
       <Navbar isOpen= {isNavbarOpen}/>
      
