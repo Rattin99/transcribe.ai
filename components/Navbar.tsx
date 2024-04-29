@@ -40,8 +40,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
     {title:"transcription"},
     {title:"date"}, {title:"meeting"},
     {title:"transcription"},
-    {title:"date"},
-    {title:"date"},
+  
 
 
   ]
@@ -53,8 +52,8 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
     return (
         <nav  className={`${
             isOpen ? "flex fixed inset-x-0 bottom-0 sm:static" : "hidden sm:flex"
-          } h-1/2 sm:h-screen w-full sm:w-[250px] flex-col justify-between p-2 bg-white border-r shadow-sm`}>
-            <Button className=""> + New Meeting</Button>
+          } h-1/2 sm:h-screen w-full sm:w-[250px] flex-col justify-between p-2 bg-white border-t sm:border-r shadow-sm`}>
+            <Button className="p-6 bg-muted text-black hover:bg-slate-400"> + New Meeting</Button>
             <ScrollArea className="h-5/6">
                 {
                     meetings.map((value,index) => (
@@ -65,16 +64,14 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
                 }
             </ScrollArea>
             <DropdownMenu>
-                <DropdownMenuTrigger className="w-full">
-                    <div className="flex items-center justify-center  px-4 py-2 bg-gray-100 rounded-md">
-                    <Avatar className="mr-2 rounded-full">
-                        <AvatarImage src="./" />
-                        <AvatarFallback className="p-2 bg-red-400">RS</AvatarFallback>
-                    </Avatar>
-                    <span className="text-3xl sm:text-lg">Rattin Sadman</span>
-                    </div>
+                <DropdownMenuTrigger className="flex items-center justify-center  px-4 py-2 bg-gray-100 rounded-md hover:bg-slate-400 ">
+                        <Avatar className="mr-2 rounded-full size-8">
+                            <AvatarImage src="./" />
+                            <AvatarFallback className="bg-slate-800 text-white">RS</AvatarFallback>
+                        </Avatar>
+                        <span className="">Rattin Sadman</span>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=" min-w-56">
+                <DropdownMenuContent className=" min-w-full">
                     <DropdownMenuItem>rattin99m8@gmail.com</DropdownMenuItem>
                     <DropdownMenuSeparator/>
                     <DropdownMenuItem> <Settings className="size-4 mr-2"/> <span>settings</span></DropdownMenuItem>

@@ -87,7 +87,7 @@ export default function Home() {
   },[text])
 
   return (
-    <main className="w-screen h-screen flex overflow-hidden ">
+    <main className="w-screen h-screen flex ">
       <Menu onClick={ () => {setNavbarOpen(!isNavbarOpen)} } className="size-10 m-2 block absolute top-0 right-0 sm:hidden" />
       <Navbar isOpen= {isNavbarOpen}/>
      
@@ -95,12 +95,13 @@ export default function Home() {
         <div className="w-1/3 h-1/5 flex flex-col justify-around items-center">
           <div className="flex flex-col justify-center items-center mt-5">
             <div className="p-2">
-              <input type="text" className="text-center bg-muted text-2xl"  defaultValue={'Meeting'}/>
+              <input type="text" className="text-center bg-muted sm:text-2xl"  defaultValue={'Meeting'}/>
             </div>
-            <span >April 25, 2024</span>
+            <span className= "text-xs sm:text-base">April 25, 2024</span>
           </div>
-          <div className="p-2 mt-2">
-            <AudioRecorder onRecordingComplete={handleAudioRecord}        audioTrackConstraints={{
+          <div className="sm:p-2  sm:mt-2">
+            <AudioRecorder onRecordingComplete={handleAudioRecord}        
+                audioTrackConstraints={{
                 noiseSuppression: true,
                 echoCancellation: true
                 }} onNotAllowedOrFound={(err) => {console.log(err)}} downloadOnSavePress = {false} downloadFileExtension="mp3" />

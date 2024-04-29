@@ -47,8 +47,17 @@ export default function Login() {
     })
 
 
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log(values)
+    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+        const response = await fetch('http://localhost:5000/api/v1/user/login-user',{
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(values)
+        })
+
+        if(!response.ok) console.log("error:",response)
+
+        const res = await response.json()
+        console.log(res)
     }
 
   return (
