@@ -10,44 +10,44 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut,Settings } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 
   type Props = {
     isOpen: boolean
   }
 
-  const meetings = [
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"},
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"}, {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"},
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"},
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"}, {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"},
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"},
-    {title:"meeting"},
-    {title:"transcription"},
-    {title:"date"}, {title:"meeting"},
-    {title:"transcription"},
-  
-
-
-  ]
-
+  type Meeting = {
+    dateTime: string,
+    id: string,
+    meetingName: string,
+  }
 
 
 const Navbar: React.FC<Props> = ({isOpen}) => {
+
+    const [meetings,setMeetings] = useState<Meeting[]>([]);
+
+    const getMeetings = async () => {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/v1/transcribe/get-all-data',{
+            method: "GET",
+            headers: {
+                'Authorization': `${token}`
+            }
+        })
+
+        const res = await response.json();
+
+        setMeetings(res.data)
+    }
+
+    useEffect(() => {
+        getMeetings();
+    },[])
+    
+
 
     return (
         <nav  className={`${
@@ -57,9 +57,11 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
             <ScrollArea className="h-5/6">
                 {
                     meetings.map((value,index) => (
-                        <div key={index} className="p-2 mr-3 cursor-pointer hover:bg-muted rounded-md">
-                            <span>{value.title}</span>
-                        </div>
+                        <Link key={index} href={`/meeting/${value.id}`}>
+                            <div  className="p-2 mr-3 cursor-pointer hover:bg-muted rounded-md">
+                                <span>{value.meetingName}</span>
+                            </div>
+                        </Link>
                     ))
                 }
             </ScrollArea>

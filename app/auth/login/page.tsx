@@ -63,12 +63,15 @@ export default function Login() {
 
         if(!response.ok) console.log("error:",response)
 
-        const {email,id} = await response.json()
+        const {email,id,token} = await response.json()
+
+        localStorage.setItem('token',token);
 
         setUser({email: email, userId: id})
     }
 
     useEffect(()=> {
+        console.log(user)
         if(user) {
             router.push("/")
         }

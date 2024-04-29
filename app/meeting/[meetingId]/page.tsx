@@ -5,15 +5,18 @@ import { useEffect, useState } from "react";
 import { AudioRecorder } from "react-audio-voice-recorder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {Menu} from 'lucide-react';
+import { useParams } from "next/navigation";
 
 
-export default function Home() {
+export default function Meeting() {
+
+  const params = useParams();
 
   const [text,setText] = useState('');
   const [summary,setSummary] = useState('');
   const [notes,setNotes] = useState('');
   const [isNavbarOpen, setNavbarOpen] = useState(false);
-  const [meetingId, setMeetingID] = useState(null);
+  const [meetingId, setMeetingID] = useState(params.meetingId);
 
   const token = localStorage.getItem('token');
 
