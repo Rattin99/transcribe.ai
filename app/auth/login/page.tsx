@@ -25,9 +25,11 @@ import  {z} from 'zod';
 import {Control, FieldValues, useForm} from 'react-hook-form';
 
 
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { UserContext } from "@/components/AuthProvider";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     email: z.string().email(),
@@ -38,14 +40,19 @@ const formSchema = z.object({
 
 export default function Login() {
 
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
             password: "",
         }
-    })
+    });
 
+    const userContext  = useContext(UserContext);
+    //@ts-ignore
+    const {user, setUser} = userContext;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const response = await fetch('http://localhost:5000/api/v1/user/login-user',{
@@ -56,9 +63,16 @@ export default function Login() {
 
         if(!response.ok) console.log("error:",response)
 
-        const res = await response.json()
-        console.log(res)
+        const {email,id} = await response.json()
+
+        setUser({email: email, userId: id})
     }
+
+    useEffect(()=> {
+        if(user) {
+            router.push("/")
+        }
+    },[router,user])
 
   return (
    <main className="w-screen h-screen  flex justify-center items-center">
