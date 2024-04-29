@@ -6,6 +6,8 @@ import { AudioRecorder } from "react-audio-voice-recorder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {Menu} from 'lucide-react';
 import { useParams } from "next/navigation";
+import { allTranscribedText } from "@/lib/utils";
+import { error } from "console";
 
 
 export default function Meeting() {
@@ -17,12 +19,44 @@ export default function Meeting() {
   const [notes,setNotes] = useState('');
   const [isNavbarOpen, setNavbarOpen] = useState(false);
   const [meetingId, setMeetingID] = useState(params.meetingId);
+  const [meetingName,setMeetingName] = useState("");
 
   const token = localStorage.getItem('token');
 
 
+  const getInitialData = async () => {
+    
+    try{
+        const response = await fetch(`http://localhost:5000/api/v1/transcribe/get-single-data/${meetingId}`,{
+            method: "GET",
+            headers: {
+                "Authorization": `${token}`
+            }
+        })
+
+        if(response) {
+            const res = await response.json();
+            if(res) {
+                console.log(res)
+                setMeetingName(res.data.meetingName);
+                setSummary(res.data.summaryData[0]);
+                setNotes(res.data.notesData[0])
+                setText(allTranscribedText(res.data.transcribeData));
+            }
+
+        }
+        
+    }catch(err) {
+        console.log(err)
+    }
+  }
+
+ 
+  
+
   async function sendFile(formData: FormData) {
-    const response = await fetch('http://localhost:5000/upload', {
+    try{
+        const response = await fetch(`http://localhost:5000/upload?meetingId=${meetingId}`, {
       method: 'POST',
       headers: {
         "Authorization": `${token}`
@@ -36,72 +70,112 @@ export default function Meeting() {
     }
 
     const res = await response.json();
-    setText(res.text)
+    setText((prev) => prev + res.text)
     setMeetingID(res.meetingId);
-    console.log(res);
+    }catch(err) {
+        console.log(err)
+    }
+    
   }
 
   const handleAudioRecord = async (blob:Blob) => {
-   const fileReader = new FileReader();
-   fileReader.readAsArrayBuffer(blob);
-   fileReader.onload = async () => {
-     const arrayBuffer = fileReader.result as ArrayBuffer;
-     const formData = new FormData();
-     formData.append('file', new Blob([arrayBuffer]), 'recording.mp3');
+   try{
+    const fileReader = new FileReader();
+    fileReader.readAsArrayBuffer(blob);
+    fileReader.onload = async () => {
+        const arrayBuffer = fileReader.result as ArrayBuffer;
+        const formData = new FormData();
+        formData.append('file', new Blob([arrayBuffer]), 'recording.mp3');
 
-    await sendFile(formData);
-    
+        await sendFile(formData);
+    }
+   }catch(err){
+    console.log(err)
    }
   }
 
   const getTranscriptionSummary = async (text: string) => {
-    const response = await fetch(`http://localhost:5000/summary?meetingId=${meetingId}`,{
-      method: "POST",
-      headers: {
-        "Authorization": `${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "text": text
-      }),
-    })
+    try {
+        const response = await fetch(`http://localhost:5000/summary?meetingId=${meetingId}`,{
+        method: "POST",
+        headers: {
+            "Authorization": `${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "text": text
+        }),
+        })
 
-    if(!response.ok) {
-      console.log('Error:',response);
+        if(!response.ok) {
+        console.log('Error:',response);
+        }
+
+        const res = await response.json();
+
+        setSummary(res.text)
+    }catch (err) {
+        console.log(err)
     }
-
-    const res = await response.json();
-
-    setSummary(res.text)
   }
 
   const getTranscriptionNotes = async (text: string) => {
+   try{
     const response = await fetch(`http://localhost:5000/notes?meetingId=${meetingId}`,{
-      method: "POST",
-      headers: {
-        "Authorization": `${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "text": text
-      }),
-    })
-
-    if(!response.ok) {
-      console.log('Error:',response);
-    }
-
-    const res = await response.json();
-
-    setNotes(res.text)
+        method: "POST",
+        headers: {
+          "Authorization": `${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "text": text
+        }),
+      })
+  
+      if(!response.ok) {
+        console.log('Error:',response);
+      }
+  
+      const res = await response.json();
+  
+      setNotes(res.text)
+   }catch(err) {
+    console.log(err)
+   }
   }
 
-  useEffect( () =>{
-   if( text !== ""){
-    getTranscriptionSummary(text)
-    getTranscriptionNotes(text)
+  const handleMeetingNameChange = async (value: string) => {
+   try{
+    const response = await fetch(`http://localhost:5000/api/v1/transcribe/update-meeting-name/${meetingId}`,{
+        method: "PUT",
+        headers: {
+            "Authorization": `${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            meetingName: value
+        })
+    })
+    
+    const res = await response.json();
+
+    setMeetingName(value)
+   }catch(err) {
+    console.log(err)
    }
-  },[text])
+   
+  }
+
+    useEffect(() => {
+        getInitialData()
+    }, []);
+
+    useEffect( () =>{
+    if( text !== ""){
+        getTranscriptionSummary(text)
+        getTranscriptionNotes(text)
+    }
+    },[text])
 
   return (
     <main className="w-screen h-screen flex ">
@@ -112,7 +186,7 @@ export default function Meeting() {
         <div className="w-1/3 h-1/5 flex flex-col justify-around items-center">
           <div className="flex flex-col justify-center items-center mt-5">
             <div className="p-2">
-              <input type="text" className="text-center bg-muted sm:text-2xl"  defaultValue={'Meeting'}/>
+              <input type="text" onBlur={(e) => handleMeetingNameChange(e.target.value)} className="text-center bg-muted sm:text-2xl"  defaultValue={meetingName}/>
             </div>
             <span className= "text-xs sm:text-base">April 25, 2024</span>
           </div>
