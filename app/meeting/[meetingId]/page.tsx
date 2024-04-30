@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {Menu} from 'lucide-react';
 import { useParams } from "next/navigation";
 import { allTranscribedText } from "@/lib/utils";
-import { error } from "console";
+import Summary from "@/components/Summary";
+import Notes from "@/components/Notes";
 
 
 export default function Meeting() {
@@ -15,8 +16,8 @@ export default function Meeting() {
   const params = useParams();
 
   const [text,setText] = useState('');
-  const [summary,setSummary] = useState('');
-  const [notes,setNotes] = useState('');
+  const [summary,setSummary] = useState([]);
+  const [notes,setNotes] = useState([]);
   const [isNavbarOpen, setNavbarOpen] = useState(false);
   const [meetingId, setMeetingID] = useState(params.meetingId);
   const [meetingName,setMeetingName] = useState("");
@@ -39,8 +40,8 @@ export default function Meeting() {
             if(res) {
                 console.log(res)
                 setMeetingName(res.data.meetingName);
-                setSummary(res.data.summaryData[0]);
-                setNotes(res.data.notesData[0])
+                // setSummary(res.data.summaryData[0]);
+                // setNotes(res.data.notesData[0])
                 setText(allTranscribedText(res.data.transcribeData));
             }
 
@@ -113,7 +114,7 @@ export default function Meeting() {
 
         const res = await response.json();
 
-        setSummary(res.text)
+        setSummary(res.summaryData)
     }catch (err) {
         console.log(err)
     }
@@ -137,8 +138,8 @@ export default function Meeting() {
       }
   
       const res = await response.json();
-  
-      setNotes(res.text)
+
+      setNotes(res.notesData)
    }catch(err) {
     console.log(err)
    }
@@ -212,12 +213,9 @@ export default function Meeting() {
                       {text}
                     </p>
                   </TabsContent>
-                  <TabsContent value="summary" className=" flex justify-center"> <p className="text-wrap p-2 text-center">
-                      {summary}
-                    </p></TabsContent>
-                  <TabsContent value="notes" className=" flex justify-center"><p className="text-wrap p-2 text-center">
-                      {notes}
-                    </p>
+                  <TabsContent value="summary" className="flex justify-center"><Summary summaryData={summary} /> </TabsContent>
+                  <TabsContent value="notes" className=" flex justify-center">
+                    <Notes notesData ={notes} />
                   </TabsContent>
                </div>
              </div>
