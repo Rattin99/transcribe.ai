@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AudioRecorder } from "react-audio-voice-recorder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {Menu} from 'lucide-react';
+import useAuth from "@/components/useAuth";
 
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
   const [meetingId, setMeetingID] = useState(null);
 
   const token = localStorage.getItem('token');
+
 
 
   async function sendFile(formData: FormData) {
@@ -92,6 +94,8 @@ export default function Home() {
 
     setNotes(res.text)
   }
+
+  useAuth();
 
   useEffect( () =>{
    if( text !== ""){

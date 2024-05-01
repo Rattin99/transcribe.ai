@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input"
 
 import {zodResolver} from '@hookform/resolvers/zod';
 import  {z} from 'zod';
-import {Control, FieldValues, useForm} from 'react-hook-form';
+import {Control, FieldValues, set, useForm} from 'react-hook-form';
 
 
 import React, { useContext, useEffect } from 'react'
@@ -55,6 +55,7 @@ export default function Login() {
     const {user, setUser} = userContext;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
+       try{
         const response = await fetch('http://localhost:5000/api/v1/user/login-user',{
             method: "POST",
             headers: {'Content-Type': 'application/json'},
@@ -66,15 +67,28 @@ export default function Login() {
         const {email,id,token} = await response.json()
 
         localStorage.setItem('token',token);
+        localStorage.setItem('id',id);
+        localStorage.setItem('email',email);
 
         setUser({email: email, userId: id})
+       } catch (err) {
+        console.log(err)
+       }
     }
 
     useEffect(()=> {
-        console.log(user)
-        if(user) {
-            router.push("/")
+       const token = localStorage.getItem('token');
+
+       if(token) {
+        if(!user) {
+            const userId = localStorage.getItem('id');
+            const userEmail = localStorage.getItem('email');
+
+            setUser({email: userEmail, userId:userId});
         }
+
+        router.push('/')
+       }
     },[router,user])
 
   return (
