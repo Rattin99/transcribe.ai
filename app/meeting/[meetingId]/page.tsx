@@ -9,10 +9,10 @@ import Summary from "@/components/Summary";
 import Notes from "@/components/Notes";
 import useAuth from "@/components/useAuth";
 import Transcription from "@/components/Transcription";
-import { UserContext } from "@/components/AuthProvider";
+import { Meeting, UserContext } from "@/components/AuthProvider";
 
 
-export default function Meeting() {
+export default function Page() {
 
   const params = useParams();
 
@@ -26,7 +26,7 @@ export default function Meeting() {
 
   const userContext = useContext(UserContext);
   //@ts-ignore
-  const {meetings, setMeetings} = userContext;
+  const {setMeetings} = userContext;
 
 
 
@@ -93,6 +93,8 @@ export default function Meeting() {
     getTranscriptionSummary(newText)
     getTranscriptionNotes(newText)
     setTranscribeArray(splitString(newText))
+
+  
     }catch(err) {
         console.log(err)
     }
@@ -187,6 +189,19 @@ export default function Meeting() {
     })
     
     const res = await response.json();
+
+
+    setMeetings((meetings: Meeting[]) => {
+      const newMeetings = meetings.map((v,index) => {
+        if(v.id === meetingId){
+          v.meetingName = value
+        }
+
+        return v;
+      })
+
+      return newMeetings;
+    })
 
     setMeetingName(value)
    }catch(err) {

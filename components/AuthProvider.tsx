@@ -19,7 +19,7 @@ type AppProviderProps = {
     children: ReactNode
 }
 
-type Meeting = {
+export type Meeting = {
     dateTime: string,
     id: string,
     meetingName: string,

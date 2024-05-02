@@ -1,13 +1,14 @@
 "use client";
 
-import { UserContext } from '@/components/AuthProvider';
+import { Meeting, UserContext } from '@/components/AuthProvider';
 import Notes from '@/components/Notes';
 import Summary from '@/components/Summary';
 import Transcription from '@/components/Transcription';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useAuth from '@/components/useAuth';
 import { splitString } from '@/lib/utils';
-import React, { useContext, useState } from 'react'
+import { useRouter } from 'next/navigation';
+import React, { useContext, useEffect, useState } from 'react'
 import { AudioRecorder } from 'react-audio-voice-recorder';
 
 export default function page() {
@@ -18,6 +19,9 @@ export default function page() {
   const [notes,setNotes] = useState([]);
   const [meetingId, setMeetingID] = useState("");
   const [meetingName,setMeetingName] = useState("Meeting");
+
+    const router = useRouter();
+
 
 
   const userContext = useContext(UserContext);
@@ -32,6 +36,8 @@ export default function page() {
     
       const token = localStorage.getItem('token');
   
+     if(meetingId === "") return;
+
      try{
       const response = await fetch(`http://localhost:5000/api/v1/transcribe/update-meeting-name/${meetingId}`,{
           method: "PUT",
@@ -46,10 +52,22 @@ export default function page() {
       
       const res = await response.json();
   
+      setMeetings((meetings: Meeting[]) => {
+        const newMeetings = meetings.map((v,index) => {
+          if(v.id === meetingId){
+            v.meetingName = value
+          }
+
+          return v;
+        })
+
+        return newMeetings;
+      })
+
       setMeetingName(value)
-     }catch(err) {
+    }catch(err) {
       console.log(err)
-     }
+    }
      
     }
 
@@ -98,6 +116,8 @@ export default function page() {
     getTranscriptionSummary(newText,id)
     getTranscriptionNotes(newText,id)
     setTranscribeArray(splitString(newText))
+
+    
     }catch(err) {
         console.log(err)
     }
@@ -178,7 +198,14 @@ export default function page() {
     }
   }
 
-  useAuth()
+  useAuth();
+
+  useEffect(() => {
+    // re-route to meeting 
+    if(summary.length > 0 && notes.length > 0){
+      router.push(`/meeting/${meetingId}`)
+    }
+  },[meetingId,summary,notes])
   
   return (
     <div className="w-full bg-muted   sm:w-[88%] h-screen flex flex-col justify-center items-center">
