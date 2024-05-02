@@ -3,7 +3,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -69,9 +68,6 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
         router.push('/auth/login')
     }
 
-    const handleDelete = (e:any) => {
-        console.log(e?.target.parentNode.id)
-    }
 
     return (
         <nav  className={`${

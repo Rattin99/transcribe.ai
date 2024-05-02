@@ -42,7 +42,6 @@ export default function NavBarMore({meetingId}:Props) {
         setMeetings((meetings: any) => {
             const newMeetings = meetings.filter((value:any,i:number) => value.id !== meetingId)
 
-            console.log(newMeetings)
             return newMeetings;
         })
 

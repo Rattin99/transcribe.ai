@@ -1,12 +1,13 @@
 "use client";
 
+import { UserContext } from '@/components/AuthProvider';
 import Notes from '@/components/Notes';
 import Summary from '@/components/Summary';
 import Transcription from '@/components/Transcription';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import useAuth from '@/components/useAuth';
 import { splitString } from '@/lib/utils';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { AudioRecorder } from 'react-audio-voice-recorder';
 
 export default function page() {
@@ -19,60 +20,13 @@ export default function page() {
   const [meetingName,setMeetingName] = useState("Meeting");
 
 
-  const getTranscriptionSummary = async (text: string) => {
+  const userContext = useContext(UserContext);
 
-    const token = localStorage.getItem('token');
+  //@ts-ignore
+  const {setMeetings} = userContext;
 
-    try {
-        const response = await fetch(`http://localhost:5000/summary?meetingId=${meetingId}`,{
-        method: "POST",
-        headers: {
-            "Authorization": `${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            "text": text
-        }),
-        })
 
-        if(!response.ok) {
-        console.log('Error:',response);
-        }
-
-        const res = await response.json();
-
-        setSummary(res.summaryData)
-    }catch (err) {
-        console.log(err)
-    }
-  }
-
-  const getTranscriptionNotes = async (text: string) => {
-    const token = localStorage.getItem('token');
   
-     try{
-      const response = await fetch(`http://localhost:5000/notes?meetingId=${meetingId}`,{
-          method: "POST",
-          headers: {
-            "Authorization": `${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            "text": text
-          }),
-        })
-    
-        if(!response.ok) {
-          console.log('Error:',response);
-        }
-    
-        const res = await response.json();
-  
-        setNotes(res.notesData)
-     }catch(err) {
-      console.log(err)
-     }
-    }
   
     const handleMeetingNameChange = async (value: string) => {
     
@@ -119,21 +73,94 @@ export default function page() {
 
     const res = await response.json();
 
-    console.log(res)
 
     setText((prev) => prev + res.text)
     setMeetingID(res.meetingId);
 
+    const id = res.meetingId;
+
+    //add new meeting to navbar
+      const newMeeting = {
+        dateTime: res.created_at,
+        id: res.meetingId,
+        meetingName: meetingName
+      }
+
+      //@ts-ignore
+      setMeetings((meetings) => {
+        console.log(meetings)
+
+        return [newMeeting,...meetings]
+      });
+
     // get the summary and notes for the new text
     const newText = text + res.text;
-    getTranscriptionSummary(newText)
-    getTranscriptionNotes(newText)
+    getTranscriptionSummary(newText,id)
+    getTranscriptionNotes(newText,id)
     setTranscribeArray(splitString(newText))
     }catch(err) {
         console.log(err)
     }
     
   }
+
+  const getTranscriptionSummary = async (text: string,Id:string) => {
+
+    const token = localStorage.getItem('token');
+
+    const id = meetingId === "" ? Id : meetingId;
+
+    try {
+        const response = await fetch(`http://localhost:5000/summary?meetingId=${id}`,{
+        method: "POST",
+        headers: {
+            "Authorization": `${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "text": text
+        }),
+        })
+
+        if(!response.ok) {
+        console.log('Error:',response);
+        }
+
+        const res = await response.json();
+
+        setSummary(res.summaryData)
+    }catch (err) {
+        console.log(err)
+    }
+  }
+
+  const getTranscriptionNotes = async (text: string,Id:string) => {
+    const token = localStorage.getItem('token');
+  
+    const id = meetingId === "" ? Id : meetingId;
+     try{
+      const response = await fetch(`http://localhost:5000/notes?meetingId=${id}`,{
+          method: "POST",
+          headers: {
+            "Authorization": `${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "text": text
+          }),
+        })
+    
+        if(!response.ok) {
+          console.log('Error:',response);
+        }
+    
+        const res = await response.json();
+  
+        setNotes(res.notesData)
+     }catch(err) {
+      console.log(err)
+     }
+    }
   
   const handleAudioRecord = async (blob:Blob) => {
     try{
