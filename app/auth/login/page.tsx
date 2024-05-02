@@ -64,13 +64,14 @@ export default function Login() {
 
         if(!response.ok) console.log("error:",response)
 
-        const {email,id,token} = await response.json()
+        const {email,id,userName,token} = await response.json()
 
         localStorage.setItem('token',token);
         localStorage.setItem('id',id);
         localStorage.setItem('email',email);
+        localStorage.setItem('userName',userName);
 
-        setUser({email: email, userId: id})
+        setUser({email: email, userId: id,userName:userName})
        } catch (err) {
         console.log(err)
        }
@@ -78,12 +79,10 @@ export default function Login() {
 
     useEffect(()=> {
        const token = localStorage.getItem('token');
-
        if(token) {
         if(!user) {
             const userId = localStorage.getItem('id');
             const userEmail = localStorage.getItem('email');
-
             setUser({email: userEmail, userId:userId});
         }
 

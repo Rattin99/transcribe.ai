@@ -22,7 +22,7 @@ export default function Page() {
   const [notes,setNotes] = useState([]);
   const [meetingId, setMeetingID] = useState(params.meetingId);
   const [meetingName,setMeetingName] = useState("");
-
+  const [meetingDate,setMeetingDate] = useState("")
 
   const userContext = useContext(UserContext);
   //@ts-ignore
@@ -49,8 +49,8 @@ export default function Page() {
                 console.log(res)
                 setMeetingName(res.data.meetingName);
                 setSummary(res.data.summaryData[0]?.summary);
-                setNotes(res.data.notesData[0]?.notes)
-                // setMeetingDate(res.data.meetingDate);
+                setNotes(res.data.notesData[0]?.notes);
+                setMeetingDate(res.data.created_at);
 
                 const {textArray,text} = allTranscribedText(res.data.transcribeData);
 
@@ -222,7 +222,7 @@ export default function Page() {
           <div className="p-2">
             <input type="text" onBlur={(e) => handleMeetingNameChange(e.target.value)} className="text-center bg-muted sm:text-2xl"  defaultValue={meetingName}/>
           </div>
-          <span className= "text-xs sm:text-base">April 25, 2024</span>
+          <span className= "text-xs sm:text-base">{meetingDate}</span>
         </div>
         <div className="sm:p-2  sm:mt-2">
           <AudioRecorder onRecordingComplete={handleAudioRecord}        

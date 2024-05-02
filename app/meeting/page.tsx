@@ -91,7 +91,6 @@ export default function page() {
 
     const res = await response.json();
 
-
     setText((prev) => prev + res.text)
     setMeetingID(res.meetingId);
 

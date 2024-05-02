@@ -32,7 +32,7 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
     const userContext = useContext(UserContext);
     //@ts-ignore
     const {user,meetings, setMeetings} = userContext;
-
+    const [userName, setUserName] = useState<string | null>(null);
     const getMeetings = async () => {
         try{
             const token = localStorage.getItem('token');
@@ -51,8 +51,29 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
         }
     }
 
+    const getProfile = async () => {
+        try{
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5000/api/v1/user/get-user-profile',{
+                method: "GET",
+                headers: {
+                    'Authorization': `${token}`
+                }
+            })
+
+            const res = await response.json();
+            console.log(res)
+            setUserName(res.data.userName)
+        }catch(err) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
         getMeetings();
+    },[])
+    useEffect(() => {
+        getProfile();
     },[])
     
 
@@ -65,7 +86,6 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
         localStorage.removeItem('id')
         localStorage.removeItem('email')
         localStorage.removeItem('token')
-
         router.push('/auth/login')
     }
 
@@ -106,7 +126,7 @@ const Navbar: React.FC<Props> = ({isOpen}) => {
                             <AvatarImage src="./" />
                             <AvatarFallback className="bg-slate-800 text-white">RS</AvatarFallback>
                         </Avatar> */}
-                        <span className="">Rattin Sadman</span>
+                        <span className="">{userName}</span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className=" min-w-full">
                     <DropdownMenuItem>{user && user.email}</DropdownMenuItem>
