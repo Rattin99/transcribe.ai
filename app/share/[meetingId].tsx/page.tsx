@@ -4,10 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useParams } from "next/navigation"
 
 
-
-
-
-
 export const Page = async () => {
     return (
         <div className="w-full bg-muted   sm:w-[88%] h-screen flex flex-col justify-center items-center">
