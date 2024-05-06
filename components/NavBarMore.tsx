@@ -105,7 +105,7 @@ export default function NavBarMore({meetingId}:Props) {
                             </DialogTitle>
                         </DialogHeader>
                         <div>
-                            <span>{`/share/${meetingId}`}</span>
+                            <span>{`localhost:5000/api/v1/transcribe/get-shareable-data/${meetingId}`}</span>
                         </div>
                         <DialogFooter>
                             <DialogClose asChild>
